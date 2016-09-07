@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from sklearn import decomposition
 from sklearn import preprocessing
 from sklearn.cross_validation import train_test_split
-# from stdp_exp_module import *
 
 
 def norm_weights(weights):
