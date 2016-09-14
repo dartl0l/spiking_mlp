@@ -264,10 +264,6 @@ def spiking_cv(data, target, n_layers, neuron_classes, rnd_states,
         test_y = np.array(test_y)
 
         weights = load_weights(rnd_state, n_layers, diehl_norm=diehl_norm)
-        for i in xrange(len(n_layers)):
-            with open('rnd_state_' + str(rnd_state) +
-                      '_layer_' + str(i) + '_w.txt', 'r') as weight:
-                weights.append(norm_weights(np.loadtxt(weight)))
 
         best_res = optimizing_threshold(train_X, train_y, sim_time,
                                         freq, thresh, n_layers,
