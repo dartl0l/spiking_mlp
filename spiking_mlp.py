@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn import decomposition
 from sklearn import preprocessing
 from sklearn.cross_validation import train_test_split
-
+import multiprocessing
 
 def norm_weights(weights):
     wt = np.array(weights)
@@ -298,12 +298,17 @@ def sim_n(X, y, n_layers, weights, neuron_classes,
     errors = []
     for i in xrange(n_sims):
         result_list = []
+        workers_pool = multiprocessing.Pool(processes=num_threads)
         for i, freqs in enumerate(X):
             # print i
-            result_list.append(sim(freqs, n_layers, weights, sim_time,
-                                   th=th, max_freq=max_freq, plot=plot,
-                                   resolution=resolution,
-                                   num_threads=num_threads))
+            workers_pool.apply_async(sim, (freqs, n_layers, weights, sim_time),
+                                { # keyword arguments are passed to apply() in a dictionary
+                                   "th": th, "max_freq": max_freq, "plot": plot,
+                                   "resolution": resolution,
+                                   "num_threads": 1}, 
+                                callback=result_list.append)
+        workers_pool.close() # prohibit sending new tasks after all were sent
+        workers_pool.join() # wait for all subprocesses to stop
         error = show_result(result_list, y,
                             neuron_classes, False, first_spike=first_spike)
         errors.append(error)
