@@ -297,18 +297,21 @@ def sim_n(X, y, n_layers, weights, neuron_classes,
           resolution=0.1, num_threads=4, first_spike=False):
     errors = []
     for i in xrange(n_sims):
-        result_list = []
+        result_list = [0]*len(X)
         workers_pool = multiprocessing.Pool(processes=num_threads)
         for i, freqs in enumerate(X):
             # print i
+            result_list[i] = []
             workers_pool.apply_async(sim, (freqs, n_layers, weights, sim_time),
                                 { # keyword arguments are passed to apply() in a dictionary
                                    "th": th, "max_freq": max_freq, "plot": plot,
                                    "resolution": resolution,
                                    "num_threads": 1}, 
-                                callback=result_list.append)
+                                callback=result_list[i].append)
         workers_pool.close() # prohibit sending new tasks after all were sent
         workers_pool.join() # wait for all subprocesses to stop
+        for i in range(len(X)):
+        	result_list[i] = result_list[i][0]
         error = show_result(result_list, y,
                             neuron_classes, False, first_spike=first_spike)
         errors.append(error)
